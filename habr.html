@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Статьи Хабра с обложками, превью и фильтром по рейтингу.">
+  <title>Дайджест Хабра</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --background: #10161c;
+      --surface: #172129;
+      --panel: #1b2730;
+      --border: #31414a;
+      --text: #eef4f2;
+      --muted: #a8b9bb;
+      --accent: #8ee1c2;
+      --accent-dark: #102820;
+      --negative: #f2a998;
+      --radius: 14px;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--background);
+      color: var(--text);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; }
+    a { color: var(--accent); text-underline-offset: 0.2em; }
+    button, input, select { font: inherit; }
+    button, select, input[type="checkbox"] { cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+    [hidden] { display: none !important; }
+
+    .wrapper { width: min(1200px, calc(100% - 64px)); margin-inline: auto; }
+    .masthead { background: #141e26; border-bottom: 1px solid var(--border); }
+    .masthead-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem 2rem;
+      min-height: 5.25rem;
+      padding-block: 0.95rem;
+    }
+    .brand { display: flex; align-items: center; gap: 0.7rem; font-size: 1.15rem; font-weight: 700; }
+    .brand-mark { width: 12px; height: 12px; border: 2px solid var(--accent); border-radius: 2px; transform: rotate(45deg); }
+    .toolbar, .control-group { display: flex; align-items: center; flex-wrap: wrap; gap: 0.7rem; }
+    .toolbar { gap: 0.85rem 1.4rem; }
+    .control-group { color: var(--muted); font-size: 0.9rem; }
+    .toolbar input[type="number"], .toolbar select {
+      min-height: 2.5rem;
+      padding: 0.4rem 0.55rem;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text);
+      background: var(--background);
+    }
+    .toolbar input[type="number"] { width: 5.1rem; }
+    .toolbar input:disabled { opacity: 0.48; }
+    .toolbar select {
+      appearance: none;
+      padding-right: 1.65rem;
+      background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+                        linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+      background-position: right 12px center, right 8px center;
+      background-size: 4px 4px;
+      background-repeat: no-repeat;
+    }
+    .checkbox-label { display: inline-flex; align-items: center; gap: 0.35rem; color: var(--text); cursor: pointer; }
+    input[type="checkbox"] { accent-color: var(--accent); width: 1rem; height: 1rem; }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 2.5rem;
+      padding: 0.52rem 0.88rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 600;
+      line-height: 1.25;
+      text-decoration: none;
+    }
+    .button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+    .button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-dark); }
+    .button.primary:hover:not(:disabled) { background: #adf1d8; color: var(--accent-dark); }
+    .button:disabled { cursor: default; opacity: 0.47; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(250px, 310px);
+      align-items: start;
+      gap: clamp(24px, 3vw, 42px);
+      padding-block: 2.4rem 4rem;
+    }
+    .feed-heading { margin: 0 0 0.35rem; font-size: clamp(1.8rem, 1.5rem + 1.3vw, 2.55rem); line-height: 1.12; letter-spacing: -0.035em; }
+    .status { min-height: 1.4em; margin: 0 0 1.3rem; color: var(--muted); font-size: 0.9rem; line-height: 1.5; }
+    .status[data-error="true"] { color: var(--negative); }
+    .cards { display: grid; gap: 1rem; }
+    .card, .popular { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+    .card { min-width: 0; padding: clamp(1.05rem, 2.3vw, 1.7rem); }
+    .card h2 { margin: 0 0 1rem; font-size: clamp(1.28rem, 1.08rem + 0.9vw, 1.78rem); line-height: 1.24; letter-spacing: -0.024em; overflow-wrap: anywhere; }
+    .article-link { color: var(--text); text-decoration: none; }
+    .article-link:hover { color: var(--accent); text-decoration: underline; }
+    .cover {
+      display: block;
+      width: 100%;
+      max-height: 28rem;
+      object-fit: contain;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      background: #111a22;
+    }
+    .preview { color: #d7e3e3; font-size: 1rem; line-height: 1.67; overflow-wrap: anywhere; }
+    .preview > :first-child { margin-top: 0; }
+    .preview > :last-child { margin-bottom: 0; }
+    .preview img { max-width: 100%; max-height: 28rem; border-radius: 6px; object-fit: contain; }
+    .preview figure { margin-inline: 0; }
+    .preview blockquote { margin-inline: 0; padding-inline-start: 1rem; border-inline-start: 2px solid var(--accent); }
+    .preview pre { padding: 0.85rem; overflow-x: auto; background: var(--background); border-radius: 6px; }
+    .preview code { font-family: Consolas, monospace; }
+    .preview :is(td, th) { padding: 0.35rem 0.55rem; border: 1px solid var(--border); }
+    .preview table { display: block; max-width: 100%; overflow: auto; border-collapse: collapse; }
+    .read-more { display: flex; width: fit-content; margin-top: 1.15rem; }
+    .card-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1.15rem; padding-top: 0.9rem; border-top: 1px solid var(--border); }
+    .score { display: inline-flex; align-items: center; justify-content: center; min-width: 2.55rem; min-height: 1.75rem; padding: 0.15rem 0.42rem; border-radius: 5px; color: var(--muted); background: var(--panel); font-size: 0.88rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .score.positive { color: var(--accent); background: #203a33; }
+    .score.negative { color: var(--negative); background: #3c2a2a; }
+    .published { color: var(--muted); font-size: 0.88rem; }
+
+    .popular { position: sticky; top: 1.2rem; padding: 1.15rem; }
+    .popular h2 { margin: 0 0 0.75rem; font-size: 1.15rem; letter-spacing: -0.015em; }
+    .popular .status { margin-bottom: 0.25rem; }
+    .popular-list { margin: 0; padding: 0; list-style: none; }
+    .popular-list li { display: flex; align-items: start; gap: 0.65rem; justify-content: space-between; padding-block: 0.82rem; border-top: 1px solid var(--border); }
+    .popular-list li:last-child { padding-bottom: 0.1rem; }
+    .popular-list a { font-size: 0.96rem; line-height: 1.4; overflow-wrap: anywhere; }
+    .popular-list .score { flex: none; }
+
+    .pagination { display: flex; flex-wrap: wrap; align-items: center; gap: 0.43rem; margin-top: 1.25rem; }
+    .pagination .button[aria-current="page"] { border-color: var(--accent); color: var(--accent); background: #203a33; opacity: 1; }
+    .pagination .counter { min-width: 2.45rem; padding-inline: 0.55rem; font-variant-numeric: tabular-nums; }
+    .pagination .ellipsis { padding-inline: 0.1rem; color: var(--muted); }
+
+    @media (max-width: 780px) {
+      .wrapper { width: calc(100% - 32px); }
+      .layout { grid-template-columns: minmax(0, 1fr); padding-top: 1.5rem; gap: 1.35rem; }
+      .popular { position: static; grid-row: 1; }
+      .masthead-inner, .toolbar { gap: 0.8rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="masthead">
+    <div class="wrapper masthead-inner">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Дайджест Хабра</div>
+      <form class="toolbar" id="controls" aria-label="Настройки ленты">
+        <div class="control-group">
+          <label for="minimum-score">Рейтинг от</label>
+          <input id="minimum-score" type="number" inputmode="numeric" step="1" value="2" required>
+          <label class="checkbox-label"><input type="checkbox" id="all-scores">Все рейтинги</label>
+        </div>
+        <div class="control-group">
+          <label for="page-size">На странице</label>
+          <select id="page-size">
+            <option value="10">10</option>
+            <option value="20" selected>20</option>
+          </select>
+        </div>
+        <button class="button primary" type="button" id="refresh">Обновить</button>
+      </form>
+    </div>
+  </header>
+
+  <main class="wrapper layout">
+    <section aria-labelledby="feed-heading">
+      <h1 id="feed-heading" class="feed-heading" tabindex="-1">Статьи Хабра</h1>
+      <p id="feed-status" class="status" role="status">Загружаем ленту…</p>
+      <div class="cards" id="articles" aria-busy="true"></div>
+      <nav id="pagination" class="pagination" aria-label="Страницы ленты" hidden></nav>
+    </section>
+
+    <aside class="popular" aria-labelledby="popular-heading">
+      <h2 id="popular-heading">Читают сейчас</h2>
+      <p class="status" id="popular-status" role="status">Загружаем подборку…</p>
+      <ul class="popular-list" id="popular-articles"></ul>
+    </aside>
+  </main>
+
+  <script>
+    'use strict';
+
+    const HABR_ROOT = "https://habr.com";
+    const HABR_API = `${HABR_ROOT}/kek/v2/articles/`;
+    const HABR_SOURCE_PAGE_SIZE = 20;
+    const HABR_SIDEBAR_SIZE = 5;
+
+    async function readHabrJson(url, label, signal) {
+      let response;
+      const timeout = AbortSignal.timeout(12_000);
+      const requestSignal = signal ? AbortSignal.any([signal, timeout]) : timeout;
+      try {
+        response = await fetch(url, {
+          cache: "no-store",
+          credentials: "omit",
+          signal: requestSignal,
+        });
+      } catch (error) {
+        if (signal?.aborted) throw signal.reason;
+        if (timeout.aborted) {
+          throw new Error(`${label}: Хабр долго не отвечает. Попробуй обновить страницу.`);
+        }
+        throw new Error(`${label}: не удалось связаться с Хабром. Проверь подключение и повтори.`);
+      }
+      if (!response.ok) {
+        throw new Error(`${label}: Хабр ответил с ошибкой HTTP ${response.status}. Попробуй позже.`);
+      }
+      try {
+        return await response.json();
+      } catch (error) {
+        if (signal?.aborted) throw signal.reason;
+        if (timeout.aborted) {
+          throw new Error(`${label}: Хабр не успел передать данные. Попробуй обновить страницу.`);
+        }
+        throw new Error(`${label}: не удалось прочитать ответ Хабра. Попробуй позже.`);
+      }
+    }
+
+    function habrArticleUrl(item, id) {
+      const type = item.postType ?? item.publicationType;
+      if (type === "megaproject" || type === "specials") {
+        return `${HABR_ROOT}/ru/specials/${id}/`;
+      }
+      const company = item.isCorporative && Array.isArray(item.hubs) &&
+        item.hubs.find((hub) => hub?.type === "corporative");
+      if (company?.alias) {
+        return `${HABR_ROOT}/ru/companies/${encodeURIComponent(company.alias)}/articles/${id}/`;
+      }
+      const section = type === "sandbox" ? "sandbox" : "articles";
+      return `${HABR_ROOT}/ru/${section}/${id}/`;
+    }
+
+    function habrCoverUrl(lead) {
+      const image = lead?.image?.url || lead?.imageUrl;
+      if (typeof image !== "string" || !image) return null;
+      try {
+        const url = new URL(image, HABR_ROOT);
+        return url.protocol === "https:" ? url.href : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function readHabrArticle(id, item) {
+      const publishedAt = Date.parse(item?.timePublished);
+      const score = item?.statistics?.score;
+      if (!/^\d+$/.test(id) || String(item?.id) !== id || !Number.isFinite(publishedAt) ||
+          !Number.isInteger(score) || typeof item?.titleHtml !== "string" || !item.titleHtml.trim()) {
+        throw new Error("Хабр вернул неполную карточку статьи. Попробуй обновить страницу позже.");
+      }
+      const lead = item.leadData;
+      return {
+        id,
+        titleHtml: item.titleHtml,
+        previewHtml: typeof lead?.textHtml === "string" ? lead.textHtml : "",
+        imageUrl: habrCoverUrl(lead),
+        url: habrArticleUrl(item, id),
+        score,
+        publishedAt,
+      };
+    }
+
+    async function fetchHabrPage(pageNumber, signal) {
+      const params = new URLSearchParams({
+        queryType: "articles", sort: "rating", hl: "ru", fl: "ru",
+        page: pageNumber, perPage: HABR_SOURCE_PAGE_SIZE,
+      });
+      const label = `Страница ${pageNumber} ленты`;
+      const data = await readHabrJson(`${HABR_API}?${params}`, label, signal);
+      const ids = data?.publicationIds;
+      const lastPage = data?.pagesCount;
+      if (!Array.isArray(ids) || ids.length === 0 || !Number.isInteger(lastPage) ||
+          lastPage < pageNumber || new Set(ids).size !== ids.length) {
+        throw new Error(`${label}: Хабр вернул некорректную страницу. Попробуй обновить позже.`);
+      }
+      const articles = ids.map((id) => readHabrArticle(String(id), data.publicationRefs?.[id]));
+      if (articles.some((article, index) => index > 0 && article.publishedAt > articles[index - 1].publishedAt)) {
+        throw new Error(`${label}: статьи пришли не в хронологическом порядке. Попробуй обновить позже.`);
+      }
+      return { articles, pagesCount: lastPage };
+    }
+
+    async function fetchHabrPopular(signal) {
+      const data = await readHabrJson(`${HABR_API}most-reading?hl=ru&fl=ru`, "«Читают сейчас»", signal);
+      if (!Array.isArray(data?.articleIds) || !data.articleIds.length) {
+        throw new Error("Хабр вернул пустой блок «Читают сейчас». Попробуй обновить страницу позже.");
+      }
+      return data.articleIds.slice(0, HABR_SIDEBAR_SIZE)
+        .map((id) => readHabrArticle(String(id), data.articleRefs?.[id]));
+    }
+
+    const articlesElement = document.querySelector('#articles');
+    const feedHeading = document.querySelector('#feed-heading');
+    const feedStatus = document.querySelector('#feed-status');
+    const pagination = document.querySelector('#pagination');
+    const popularElement = document.querySelector('#popular-articles');
+    const popularStatus = document.querySelector('#popular-status');
+    const controls = document.querySelector('#controls');
+    const minimumScore = document.querySelector('#minimum-score');
+    const allScores = document.querySelector('#all-scores');
+    const pageSize = document.querySelector('#page-size');
+    const refreshButton = document.querySelector('#refresh');
+    const dateFormat = new Intl.DateTimeFormat('ru-RU', {dateStyle: 'medium', timeStyle: 'short'});
+
+    const previewTags = new Set([
+      'a', 'b', 'blockquote', 'br', 'caption', 'code', 'dd', 'del', 'dl', 'dt', 'em', 'figcaption',
+      'figure', 'hr', 'i', 'img', 'li', 'ol', 'p', 'pre', 's', 'small', 'strong', 'sub', 'sup',
+      'table', 'tbody', 'td', 'th', 'thead', 'tr', 'u', 'ul',
+    ]);
+    const discardedTags = new Set([
+      'audio', 'embed', 'form', 'iframe', 'link', 'math', 'noscript', 'object', 'script', 'style',
+      'svg', 'template', 'video',
+    ]);
+
+    let feed = makeFeed();
+    let activePage = 1;
+    let pendingFeed = null;
+    let pendingSidebar = null;
+
+    function makeFeed() {
+      return {articles: [], seen: new Set(), nextPage: 1, totalPages: null, oldest: Infinity};
+    }
+
+    function makeElement(tag, className, text) {
+      const element = document.createElement(tag);
+      if (className) element.className = className;
+      if (text !== undefined) element.textContent = text;
+      return element;
+    }
+
+    function safeWebUrl(value, base) {
+      if (!value) return null;
+      try {
+        const url = new URL(value, base);
+        if (url.protocol === 'https:' || url.protocol === 'http:') return url.href;
+      } catch {
+        return null;
+      }
+      return null;
+    }
+
+    function externalLink(className, text, url) {
+      const link = makeElement('a', className, text);
+      link.href = url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      return link;
+    }
+
+    function makeImage(url, alt, className) {
+      const image = makeElement('img', className);
+      image.src = url;
+      image.alt = alt;
+      image.loading = 'lazy';
+      image.decoding = 'async';
+      image.addEventListener('error', () => image.hidden = true, {once: true});
+      return image;
+    }
+
+    function parseMarkup(html) {
+      const template = document.createElement('template');
+      template.innerHTML = html;
+      return template.content;
+    }
+
+    function articleTitle(html) {
+      return parseMarkup(html).textContent.trim();
+    }
+
+    function appendPreview(parent, source, base) {
+      for (const node of source.childNodes) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          parent.append(document.createTextNode(node.data));
+          continue;
+        }
+        if (node.nodeType !== Node.ELEMENT_NODE || discardedTags.has(node.localName)) continue;
+        if (node.localName === 'img') {
+          const src = safeWebUrl(node.getAttribute('src'), base);
+          if (src) parent.append(makeImage(src, node.getAttribute('alt') || ''));
+          continue;
+        }
+
+        let element = parent;
+        if (node.localName === 'a') {
+          const href = safeWebUrl(node.getAttribute('href'), base);
+          if (href) element = externalLink('', '', href);
+        } else if (/^h[1-6]$/.test(node.localName)) {
+          element = makeElement('h3');
+        } else if (previewTags.has(node.localName)) {
+          element = makeElement(node.localName);
+        }
+        appendPreview(element, node, base);
+        if (element !== parent) parent.append(element);
+      }
+    }
+
+    function makeScore(score) {
+      const scoreText = score > 0 ? `+${score}` : String(score).replace('-', '−');
+      const badge = makeElement('span', 'score', scoreText);
+      badge.setAttribute('title', `Рейтинг ${scoreText}`);
+      if (score !== 0) badge.classList.add(score > 0 ? 'positive' : 'negative');
+      return badge;
+    }
+
+    function makeCard(article) {
+      const card = makeElement('article', 'card');
+      const heading = makeElement('h2');
+      heading.append(externalLink('article-link', articleTitle(article.titleHtml), article.url));
+      card.append(heading);
+
+      const cover = safeWebUrl(article.imageUrl, article.url);
+      if (cover) card.append(makeImage(cover, '', 'cover'));
+      if (article.previewHtml) {
+        const preview = makeElement('div', 'preview');
+        appendPreview(preview, parseMarkup(article.previewHtml), article.url);
+        card.append(preview);
+      }
+      card.append(externalLink('button read-more', 'Читать далее', article.url));
+
+      const footer = makeElement('div', 'card-footer');
+      const published = new Date(article.publishedAt);
+      const publishedTime = makeElement('time', 'published', dateFormat.format(published));
+      publishedTime.dateTime = published.toISOString();
+      footer.append(makeScore(article.score), publishedTime);
+      card.append(footer);
+      return card;
+    }
+
+    function report(element, message, isError = false) {
+      element.hidden = !message;
+      element.textContent = message;
+      element.dataset.error = isError;
+    }
+
+    function hasSourcePage(collection) {
+      return collection.totalPages === null || collection.nextPage <= collection.totalPages;
+    }
+
+    function selectArticles(collection, threshold) {
+      return threshold === null ? collection.articles : collection.articles.filter(article => article.score >= threshold);
+    }
+
+    function getThreshold() {
+      return allScores.checked ? null : minimumScore.valueAsNumber;
+    }
+
+    function paginationButton(label, target, selected = false, disabled = false, numeric = false) {
+      const button = makeElement('button', `button${numeric ? ' counter' : ''}`, label);
+      button.type = 'button';
+      button.disabled = disabled || selected;
+      if (selected) button.setAttribute('aria-current', 'page');
+      if (numeric) button.setAttribute('aria-label', `Страница ${label}`);
+      button.addEventListener('click', () => showPage(target, {scrollToFeed: true}));
+      return button;
+    }
+
+    function renderPagination(total, size, busy = false) {
+      const knownPages = Math.max(1, Math.ceil(total / size));
+      const canAdvance = activePage < knownPages || hasSourcePage(feed);
+      pagination.hidden = knownPages === 1 && !canAdvance;
+      if (pagination.hidden) return;
+
+      const buttons = [paginationButton('Назад', activePage - 1, false, activePage === 1 || busy)];
+      const first = Math.max(1, activePage - 2);
+      const last = Math.min(knownPages, activePage + 2);
+      if (first > 1) buttons.push(paginationButton('1', 1, false, busy, true));
+      if (first > 2) buttons.push(makeElement('span', 'ellipsis', '…'));
+      for (let number = first; number <= last; number += 1) {
+        buttons.push(paginationButton(String(number), number, number === activePage, busy, true));
+      }
+      if (last < knownPages || hasSourcePage(feed)) buttons.push(makeElement('span', 'ellipsis', '…'));
+      if (last < knownPages) buttons.push(paginationButton(String(knownPages), knownPages, false, busy, true));
+      buttons.push(paginationButton('Дальше', activePage + 1, false, !canAdvance || busy));
+      pagination.replaceChildren(...buttons);
+    }
+
+    function renderFeed(matches, size) {
+      const start = (activePage - 1) * size;
+      const visible = matches.slice(start, start + size);
+      articlesElement.replaceChildren(...visible.map(makeCard));
+      const message = visible.length
+        ? `Статьи ${start + 1}–${start + visible.length}`
+        : 'Хабр не вернул статей с таким рейтингом.';
+      report(feedStatus, message);
+      renderPagination(matches.length, size);
+    }
+
+    function addSourcePage(collection, page, number) {
+      for (const article of page.articles) {
+        if (collection.seen.has(article.id) || article.publishedAt > collection.oldest) continue;
+        collection.seen.add(article.id);
+        collection.articles.push(article);
+      }
+      if (page.articles.length) {
+        collection.oldest = Math.min(collection.oldest, page.articles.at(-1).publishedAt);
+      }
+      collection.totalPages = page.pagesCount;
+      collection.nextPage = number + 1;
+    }
+
+    async function showPage(target, {reset = false, scrollToFeed = false} = {}) {
+      if (!controls.reportValidity()) return;
+      pendingFeed?.abort();
+      const request = new AbortController();
+      pendingFeed = request;
+      const collection = reset ? makeFeed() : feed;
+      const size = Number(pageSize.value);
+      const threshold = getThreshold();
+      let matches = selectArticles(collection, threshold);
+      articlesElement.setAttribute('aria-busy', 'true');
+      renderPagination(selectArticles(feed, threshold).length, size, true);
+
+      try {
+        while (matches.length < target * size && hasSourcePage(collection)) {
+          const number = collection.nextPage;
+          report(feedStatus, `Загружаем ленту · страница Хабра ${number}…`);
+          const page = await fetchHabrPage(number, request.signal);
+          if (request.signal.aborted) return;
+          addSourcePage(collection, page, number);
+          matches = selectArticles(collection, threshold);
+        }
+        feed = collection;
+        activePage = Math.min(target, Math.max(1, Math.ceil(matches.length / size)));
+        renderFeed(matches, size);
+        if (scrollToFeed) {
+          feedHeading.focus({preventScroll: true});
+          feedHeading.scrollIntoView({block: 'start'});
+        }
+      } catch (error) {
+        if (request.signal.aborted) return;
+        report(feedStatus, `Не удалось загрузить ленту. ${error.message}`, true);
+        renderPagination(selectArticles(feed, threshold).length, size);
+      } finally {
+        if (pendingFeed === request) {
+          pendingFeed = null;
+          articlesElement.setAttribute('aria-busy', 'false');
+        }
+      }
+    }
+
+    async function refreshSidebar() {
+      pendingSidebar?.abort();
+      const request = new AbortController();
+      pendingSidebar = request;
+      report(popularStatus, 'Загружаем подборку…');
+      try {
+        const articles = await fetchHabrPopular(request.signal);
+        if (request.signal.aborted) return;
+        const items = articles.map(article => {
+          const item = makeElement('li');
+          item.append(externalLink('article-link', articleTitle(article.titleHtml), article.url), makeScore(article.score));
+          return item;
+        });
+        popularElement.replaceChildren(...items);
+        report(popularStatus, items.length ? '' : 'Подборка Хабра пуста.');
+      } catch (error) {
+        if (!request.signal.aborted) report(popularStatus, `Не удалось загрузить подборку. ${error.message}`, true);
+      } finally {
+        if (pendingSidebar === request) pendingSidebar = null;
+      }
+    }
+
+    function refresh() {
+      if (!controls.reportValidity()) return;
+      showPage(1, {reset: true});
+      refreshSidebar();
+    }
+
+    function applyControls() {
+      if (!controls.reportValidity()) return;
+      activePage = 1;
+      if (feed.totalPages !== null) renderFeed(selectArticles(feed, getThreshold()), Number(pageSize.value));
+      showPage(1);
+    }
+
+    controls.addEventListener('submit', event => {
+      event.preventDefault();
+      applyControls();
+    });
+    minimumScore.addEventListener('change', applyControls);
+    allScores.addEventListener('change', () => {
+      minimumScore.disabled = allScores.checked;
+      applyControls();
+    });
+    pageSize.addEventListener('change', applyControls);
+    refreshButton.addEventListener('click', refresh);
+    refresh();
+  </script>
+</body>
+</html>
