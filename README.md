@@ -1,31 +1,31 @@
-# Habr Digest
+# Дайджест Хабра
 
-A standalone dark-mode reader for the Russian-language [Habr article feed](https://habr.com/ru/articles/). It runs from one HTML file and loads articles directly from Habr.
+Локальная страница для чтения [ленты Хабра](https://habr.com/ru/articles/) в тёмной теме. Она состоит из одного HTML-файла и загружает статьи напрямую с Хабра.
 
-## Open the reader
+## Как открыть ленту
 
-1. Select **Code → Download ZIP** on GitHub and extract the archive, or clone the repository.
-2. Open `habr.html` in your browser. The page needs an internet connection to load the feed and covers.
-3. Use **Рейтинг от** to set a minimum score, **Все рейтинги** to show every score, or **Обновить** to reload the newest articles.
+1. На GitHub выбери **Code → Download ZIP** и распакуй архив. Также можно клонировать репозиторий.
+2. Открой `habr.html` в браузере двойным щелчком. Для загрузки статей и обложек нужен интернет.
+3. В поле **Рейтинг от** укажи минимальный рейтинг или включи **Все рейтинги**. Кнопка **Обновить** загружает свежие статьи.
 
-The reader needs no installation, build, local web server, or Codex session. Use a current browser. The page was tested in Chrome directly from `file://`.
+Для запуска достаточно современного браузера. Открытие через `file://` проверено в Chrome.
 
-## How the feed works
+## Как устроена лента
 
-- The minimum rating defaults to **+2** and applies from the first article onward. Negative thresholds are supported.
-- Show **10 or 20** articles per page. Pagination fills each page with matching articles in publication order until Habr's feed ends.
-- Cards show the original title, available cover, formatted preview, rating, and publication time. **Читать далее** opens the full article on Habr.
-- **Читают сейчас** shows Habr's current sidebar articles independently of the feed filter.
-- Each opening starts at the newest articles. The browser page keeps no reading history between openings.
+- По умолчанию показываются статьи с рейтингом **+2 и выше**. Порог применяется с первой статьи и может быть отрицательным.
+- На странице помещается **10 или 20 статей**. При переходе дальше страница добирает подходящие публикации в порядке от новых к старым до конца выдачи Хабра.
+- В карточке видны полный заголовок, обложка при наличии, оригинальное превью, рейтинг и время публикации. Кнопка **Читать далее** открывает статью на Хабре.
+- Блок **Читают сейчас** показывает актуальную подборку Хабра независимо от порога рейтинга.
+- При каждом открытии лента начинается с самых новых публикаций. История чтения между открытиями не сохраняется.
 
-## Optional Codex or command-line digest
+## Дайджест в Codex или командной строке
 
-Open the repository as a Codex project and invoke `$habr-digest`, or run the standard-library collector with Python 3.11 or newer.
+Открой папку репозитория как проект в Codex и вызови `$habr-digest`. Чтобы получить тот же дайджест из командной строки, запусти команду из корня репозитория. Требуется Python 3.11 или новее.
 
 ```sh
 python .agents/skills/habr-digest/scripts/digest.py
 ```
 
-The command prints a Markdown digest and saves the last successful pass in a local `state.sqlite3` file. That checkpoint belongs to the command-line and chat workflows.
+Скрипт выводит дайджест в Markdown и записывает отметку последнего успешного прохода в локальный файл `state.sqlite3`. Эту отметку используют командный скрипт и навык Codex.
 
-For the Habr sources, pagination details, and checkpoint behavior, see [the project workflow](docs/habr-workflow.md).
+Источники данных, правила листания и формат отметки описаны в [документации проекта](docs/habr-workflow.md).
