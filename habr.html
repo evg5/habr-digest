@@ -43,8 +43,11 @@
       min-height: 5.25rem;
       padding-block: 0.95rem;
     }
-    .brand { display: flex; align-items: center; gap: 0.7rem; font-size: 1.15rem; font-weight: 700; }
-    .brand-mark { width: 12px; height: 12px; border: 2px solid var(--accent); border-radius: 2px; transform: rotate(45deg); }
+    .brand { display: flex; align-items: center; gap: 1rem; }
+    .brand a { color: var(--text); text-decoration: none; }
+    .brand a:hover { color: var(--accent); }
+    .brand-name { font-size: 1.75rem; font-weight: 700; line-height: 1; }
+    .brand-streams { padding-inline-start: 1rem; border-inline-start: 1px solid var(--border); }
     .toolbar, .control-group { display: flex; align-items: center; flex-wrap: wrap; gap: 0.7rem; }
     .toolbar { gap: 0.85rem 1.4rem; }
     .control-group { color: var(--muted); font-size: 0.9rem; }
@@ -157,7 +160,10 @@
 <body>
   <header class="masthead">
     <div class="wrapper masthead-inner">
-      <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Дайджест Хабра</div>
+      <nav class="brand" aria-label="Разделы Хабра">
+        <a class="brand-name" href="https://habr.com/ru/" target="_blank" rel="noopener noreferrer">Хабр</a>
+        <a class="brand-streams" href="https://habr.com/ru/articles/" target="_blank" rel="noopener noreferrer">Все потоки</a>
+      </nav>
       <form class="toolbar" id="controls" aria-label="Настройки ленты">
         <div class="control-group">
           <label for="minimum-score">Рейтинг от</label>
@@ -178,7 +184,7 @@
 
   <main class="wrapper layout">
     <section aria-labelledby="feed-heading">
-      <h1 id="feed-heading" class="feed-heading" tabindex="-1">Статьи Хабра</h1>
+      <h1 id="feed-heading" class="feed-heading" tabindex="-1">Все потоки</h1>
       <p id="feed-status" class="status" role="status">Загружаем ленту…</p>
       <div class="cards" id="articles" aria-busy="true"></div>
       <nav id="pagination" class="pagination" aria-label="Страницы ленты" hidden></nav>
