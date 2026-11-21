@@ -207,7 +207,7 @@
   <header class="masthead">
     <div class="wrapper masthead-inner">
       <nav class="brand" aria-label="Основная навигация">
-        <a class="brand-name" href="https://habr.com/ru/" target="_blank" rel="noopener noreferrer">Хахабр</a>
+        <a class="brand-name" href="#top">Хахабр</a>
         <span class="brand-divider" aria-hidden="true"></span>
         <a class="brand-streams" href="https://habr.com/ru/articles/" target="_blank" rel="noopener noreferrer">Все потоки</a>
         <span class="brand-divider" aria-hidden="true"></span>
@@ -372,6 +372,7 @@
     const minimumScore = document.querySelector('#minimum-score');
     const allScores = document.querySelector('#all-scores');
     const pageSize = document.querySelector('#page-size');
+    const brandLink = document.querySelector('.brand-name');
     const refreshButton = document.querySelector('#refresh');
     const dateFormat = new Intl.DateTimeFormat('ru-RU', {dateStyle: 'medium', timeStyle: 'short'});
 
@@ -656,6 +657,12 @@
       applyControls();
     });
     pageSize.addEventListener('change', applyControls);
+    brandLink.addEventListener('click', event => {
+      if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      showPage(1, {reset: true});
+      window.scrollTo(0, 0);
+    });
     refreshButton.addEventListener('click', refresh);
     refresh();
   </script>
