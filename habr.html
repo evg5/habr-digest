@@ -144,7 +144,18 @@
     .preview th { background: var(--panel); }
     .preview table { display: block; max-width: 100%; overflow: auto; border-collapse: collapse; }
     .preview hr { height: 1px; border: 0; background: var(--panel); }
-    .read-more { display: block; width: fit-content; margin-top: 1.15rem; font-size: 0.8125rem; line-height: 1.6875rem; }
+    .read-more {
+      display: block;
+      width: fit-content;
+      margin-top: 1.15rem;
+      padding: 0.625rem 1.125rem;
+      border: 1px solid currentColor;
+      border-radius: 4px;
+      font-size: 1.125rem;
+      line-height: 1.4;
+      text-decoration: none;
+    }
+    .read-more:hover { color: var(--accent-hover); }
     .card-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1.15rem; }
     .score { display: inline-flex; align-items: center; justify-content: center; min-width: 2.55rem; min-height: 1.75rem; padding: 0.15rem 0.42rem; color: var(--muted); font-size: 0.8125rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
     .score.positive { color: var(--positive); }
